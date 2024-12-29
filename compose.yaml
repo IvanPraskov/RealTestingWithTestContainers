@@ -1,0 +1,35 @@
+services:
+  credit-scoring-app:
+    build:
+      context: ./CreditScoringSystem
+      dockerfile: Dockerfile
+    ports:
+      - "5000:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - credit-scoring-postgres-db
+      - employment-history-api
+  
+  credit-scoring-postgres-db:
+    image: postgres:latest
+    container_name: credit-scoring-postgres-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD:  devbgdemodb
+      POSTGRES_DB: CreditScoringSystem
+    volumes:
+      - postgres-data:/var/lib/postgresql/data # Persist data locally
+
+  employment-history-api:
+    build:
+      context: ./EmploymentHistoryAPI
+      dockerfile: Dockerfile
+    ports:
+      - "5001:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+volumes:
+  postgres-data:
