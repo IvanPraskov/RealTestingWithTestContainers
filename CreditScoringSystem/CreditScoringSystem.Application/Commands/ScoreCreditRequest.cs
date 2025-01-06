@@ -1,3 +1,3 @@
 ﻿namespace CreditScoringSystem.Application.Commands;
 
-public record ScoreCreditRequest();
+public record ScoreCreditRequest(string CustomerId, decimal RequestedAmount);

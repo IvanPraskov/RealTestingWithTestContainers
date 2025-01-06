@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CreditScoringSystem.Application;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CreditScoringSystem.API.Controllers;
 
@@ -6,18 +7,27 @@ namespace CreditScoringSystem.API.Controllers;
 [ApiController]
 public class CreditsController : ControllerBase
 {
-    [HttpPost]
-    public async Task<IActionResult> ScoreClientCreditRequest(ClientCreditRequest request)
+    private readonly ICreditRequestService _creditRequestScoringService;
+
+    public CreditsController(ICreditRequestService creditRequestScoringService)
     {
-        return Ok();
+        _creditRequestScoringService = creditRequestScoringService;
     }
 
-    public record ClientCreditRequest(string ClientId, decimal RequestedCreditAmount, decimal DeclaredMonthlyIncome, decimal DeclaredExistingDebts, EmploymentStatus EmploymentStatus);
-}
+    [HttpPost]
+    public async Task<IActionResult> ScoreClientCreditRequest(CustomerCreditRequest request, CancellationToken ct)
+    {
+        if (request.CustomerId.Length != 10 || request.RequestedCreditAmount <= 0)
+        {
+            return BadRequest();
+        }
 
-public enum EmploymentStatus 
-{
-    FullTime = 1,
-    PartTime = 2,
-    SelfEmployeed = 3,
+        var response = await _creditRequestScoringService.MakeCreditRequestDecision(new(request.CustomerId, request.RequestedCreditAmount), ct);
+        return response is null
+            ? BadRequest()
+            : Ok(response);
+    }
+
+    
 }
+public record CustomerCreditRequest(string CustomerId, decimal RequestedCreditAmount);
