@@ -1,5 +1,5 @@
 ﻿using CreditScoringSystem.API;
-using CreditScoringSystem.Domain.Contracts;
+using CreditScoringSystem.API.CreditRequests.Clients;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;

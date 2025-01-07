@@ -1,6 +1,6 @@
-﻿using CreditScoringSystem.API.Controllers;
-using CreditScoringSystem.Application.Responses;
-using CreditScoringSystem.Domain.Contracts;
+﻿using CreditScoringSystem.API.CreditRequests.Data.Dtos;
+using CreditScoringSystem.API.CreditRequests.Data.Responses;
+using CreditScoringSystem.API.CreditRequests.MakeCreditDecision;
 using CreditScoringSystem.IntegrationTests.Fixtures;
 using CreditScoringSystem.IntegrationTests.Helpers;
 using Dapper;
@@ -32,7 +32,7 @@ public class CreditRequestScoringTests : IClassFixture<CustomWebApplicationFacto
         const decimal requestedAmount = 10000;
         const decimal customerNetMonthlyIncome = 5000;
         // Max employment stability bonus - over 5 years on full time job
-        var empHistoryResponse = new EmploymentHistoryResponse(Domain.EmploymentType.FullTime, 60, customerNetMonthlyIncome);
+        var empHistoryResponse = new EmploymentHistoryResponse(EmploymentType.FullTime, 60, customerNetMonthlyIncome);
         _customWebApplicationFactory.EmploymentHistoryClientMock
             .Setup(x => x.GetCustomerEmploymentHistory(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(empHistoryResponse);
@@ -73,7 +73,7 @@ public class CreditRequestScoringTests : IClassFixture<CustomWebApplicationFacto
         const decimal customerNetMonthlyIncome = 5000;
        
         // No employment stability bonus because of just 10 months on the full-time job.
-        var empHistoryResponse = new EmploymentHistoryResponse(Domain.EmploymentType.FullTime, 10, customerNetMonthlyIncome);
+        var empHistoryResponse = new EmploymentHistoryResponse(EmploymentType.FullTime, 10, customerNetMonthlyIncome);
         _customWebApplicationFactory.EmploymentHistoryClientMock
             .Setup(x => x.GetCustomerEmploymentHistory(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(empHistoryResponse);
@@ -109,7 +109,7 @@ public class CreditRequestScoringTests : IClassFixture<CustomWebApplicationFacto
     {
         // No employment stability bonus because of just 10 months on the full-time job.
         const decimal customerNetMonthlyIncome = 5000;
-        var empHistoryResponse = new EmploymentHistoryResponse(Domain.EmploymentType.FullTime, 10, customerNetMonthlyIncome);
+        var empHistoryResponse = new EmploymentHistoryResponse(EmploymentType.FullTime, 10, customerNetMonthlyIncome);
         _customWebApplicationFactory.EmploymentHistoryClientMock
             .Setup(x => x.GetCustomerEmploymentHistory(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(empHistoryResponse);
@@ -148,7 +148,7 @@ public class CreditRequestScoringTests : IClassFixture<CustomWebApplicationFacto
     {
         // Part-time employment stability bonus of +5 because of over 24 months on the job.
         const decimal customerNetMonthlyIncome = 5000;
-        var empHistoryResponse = new EmploymentHistoryResponse(Domain.EmploymentType.PartTime, 30, customerNetMonthlyIncome);
+        var empHistoryResponse = new EmploymentHistoryResponse(EmploymentType.PartTime, 30, customerNetMonthlyIncome);
         _customWebApplicationFactory.EmploymentHistoryClientMock
             .Setup(x => x.GetCustomerEmploymentHistory(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(empHistoryResponse);
@@ -187,7 +187,7 @@ public class CreditRequestScoringTests : IClassFixture<CustomWebApplicationFacto
     {
         // No Part-time employment stability bonus because of less than 24 months on the job.
         const decimal customerNetMonthlyIncome = 1500;
-        var empHistoryResponse = new EmploymentHistoryResponse(Domain.EmploymentType.PartTime, 12, customerNetMonthlyIncome);
+        var empHistoryResponse = new EmploymentHistoryResponse(EmploymentType.PartTime, 12, customerNetMonthlyIncome);
         _customWebApplicationFactory.EmploymentHistoryClientMock
             .Setup(x => x.GetCustomerEmploymentHistory(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(empHistoryResponse);
