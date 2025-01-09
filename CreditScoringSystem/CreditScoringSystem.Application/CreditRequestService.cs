@@ -51,10 +51,10 @@ internal class CreditRequestService : ICreditRequestService
 
         await creditRequest.MakeCreditDecision(_creditHistoryRepository, _creditRequestRepository);
         _logger.LogInformation("Credit request scored successfully. {@CreditRequest}", creditRequest);
-        return new(creditRequest.CustomerId, MapScoringDecision(creditRequest.ScoringDecision), creditRequest.MaxCreditAmount);
+        return new(creditRequest.CustomerId, MapCreditRequestDecision(creditRequest.CreditRequestDecision), creditRequest.MaxCreditAmount);
     }
 
-    private static string MapScoringDecision(CreditRequestDecision scoringResultDecision) => scoringResultDecision switch
+    private static string MapCreditRequestDecision(CreditRequestDecision scoringResultDecision) => scoringResultDecision switch
     {
         CreditRequestDecision.Approved => "Approved",
         CreditRequestDecision.ManualReviewRequired => "For manual review",

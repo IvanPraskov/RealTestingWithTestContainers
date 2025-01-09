@@ -26,8 +26,7 @@ public class CreditsController : ControllerBase
         return response is null
             ? BadRequest()
             : Ok(response);
-    }
-
-    
+    }  
 }
+
 public record CustomerCreditRequest(string CustomerId, decimal RequestedCreditAmount);
