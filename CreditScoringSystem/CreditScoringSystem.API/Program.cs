@@ -23,7 +23,8 @@ public class Program
 
         var app = builder.Build();
 
-        await new DbSeeder(app.Configuration).Seed();
+        var connString = app.Configuration.GetConnectionString("CreditScoringSystem") ?? string.Empty;
+        await DbSeeder.Seed(connString);
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
