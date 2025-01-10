@@ -9,7 +9,7 @@ public sealed class CreditRequest
 
     public decimal MaxCreditAmount { get; private set; }
 
-    public CreditRequestDecision ScoringDecision { get; private set;  }
+    public CreditRequestDecision CreditRequestDecision { get; private set;  }
 
     public string CustomerId { get; }
 
@@ -36,7 +36,7 @@ public sealed class CreditRequest
     public async Task MakeCreditDecision(ICreditHistoryRepository creditHistoryRepository, ICreditRequestRepository creditRequestRepository)
     {
         CustomerScore = await CalculateCreditScore(creditHistoryRepository);
-        ScoringDecision = DecideOnCreditRequest(CustomerScore);
+        CreditRequestDecision = DecideOnCreditRequest(CustomerScore);
 
         await creditRequestRepository.SaveCreditRequest(this);
     }
@@ -72,7 +72,7 @@ public sealed class CreditRequest
 
     private int ApplyDebtToIncomePenaltyIfAny(int currentScore, decimal existingDebt)
     {
-        var dti = Math.Round((existingDebt / _employmentHistory.CurrentNetMonthlyIncome) * 100, MidpointRounding.ToNegativeInfinity);
+        var dti = CalculateDebtToIncomeRatio(existingDebt, _employmentHistory.CurrentNetMonthlyIncome);
         currentScore -= dti switch
         {
             <= 30 => 0,
@@ -84,6 +84,9 @@ public sealed class CreditRequest
 
         return currentScore;
     }
+
+    private static decimal CalculateDebtToIncomeRatio(decimal existingDebt, decimal currentNetMonthlyIncome)
+        => Math.Round((existingDebt / currentNetMonthlyIncome) * 100, MidpointRounding.ToNegativeInfinity);
 
     private int ApplyEmploymentStabilityBonusIfAny(int currentScore)
     {

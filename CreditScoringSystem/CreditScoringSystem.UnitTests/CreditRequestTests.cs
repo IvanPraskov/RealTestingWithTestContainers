@@ -35,6 +35,6 @@ public class CreditRequestTests
 
         Assert.Equal(100, credit.CustomerScore);
         Assert.Equal(expectedMaxCreditAmount, credit.MaxCreditAmount);
-        Assert.Equal(CreditRequestDecision.Approved, credit.ScoringDecision);
+        Assert.Equal(CreditRequestDecision.Approved, credit.CreditRequestDecision);
     }
 }

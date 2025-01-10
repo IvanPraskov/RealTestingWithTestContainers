@@ -24,7 +24,7 @@ internal class CreditRequestRepository : ICreditRequestRepository
             CustomerId = creditRequest.CustomerId,
             RequestedAmount = creditRequest.RequestedAmount,
             MaxCreditAmount = creditRequest.MaxCreditAmount,
-            CreditRequestDecisionId = creditRequest.ScoringDecision,
+            CreditRequestDecisionId = creditRequest.CreditRequestDecision,
             CustomerScore = creditRequest.CustomerScore,
         };
 

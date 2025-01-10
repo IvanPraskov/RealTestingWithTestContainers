@@ -26,6 +26,13 @@ public class CreditRequestScoringTests : IClassFixture<CustomWebApplicationFacto
         _databaseFixture = databaseFixture;
     }
 
+    /// <summary>
+    /// Scenario:
+    ///     EmploymentType - Full-Time, over 3 years on the job.
+    ///     Credit history - no missed payments, age over 25.
+    ///     DTI ratio is below 30%
+    ///     Expected outcome is, appproved for max credit amount 20x on net monthly income, final score of 100.
+    /// </summary>
     [Fact]
     public async Task CreditRequest_ShouldBeApproved_For20xOnMonthlyIncome_WithScoreOf100_WhenFullTimeEmploymentIsOver3Years_CreditHistoryHasNoMissedPayments_AndDebtToIncomeIsLowest()
     {
@@ -66,6 +73,13 @@ public class CreditRequestScoringTests : IClassFixture<CustomWebApplicationFacto
         Assert.Equal(expectedCustomerScore, customerScore);
     }
 
+    /// <summary>
+    /// Scenario:
+    ///     EmploymentType - Full-Time, less than 1 year on the job.
+    ///     Credit history - 2 missed payments, age over 25.
+    ///     DTI ratio is 50-60%
+    ///     Expected outcome is, appproved for max credit amount 10x on net monthly income, final score of 70.
+    /// </summary>
     [Fact]
     public async Task CreditRequest_ShouldBeApproved_For10xOnMonthlyIncome_WithScoreOf70_WhenFullTimeEmploymentIsLessThanOneYear_CreditHistoryHasOneOrTwoMissedPayments_AndDebtToIncomeIsMidToHigh()
     {
@@ -105,6 +119,13 @@ public class CreditRequestScoringTests : IClassFixture<CustomWebApplicationFacto
         Assert.Equal(expectedCustomerScore, customerScore);
     }
 
+    /// <summary>
+    /// Scenario:
+    ///     EmploymentType - Full-Time, less than 1 year on the job.
+    ///     Credit history - 2 missed payments, age over 25.
+    ///     DTI ratio is 50-60%
+    ///     Expected outcome is, rejected because requested amount is over max credit amount 10x on net monthly income, final score of 70.
+    /// </summary>
     [Fact]
     public async Task CreditRequest_ShouldBeRejected_WhenRequestedAmount_IsOverMaxCreditAmount()
     {
@@ -127,6 +148,7 @@ public class CreditRequestScoringTests : IClassFixture<CustomWebApplicationFacto
         var httpClient = _customWebApplicationFactory.CreateClient();
         // Set requested amount larger than the expected approved max credit amount
         const decimal requestedAmount = expectedMaxCreditAmount * 2;
+
         var creditRequest = new CustomerCreditRequest(testData.CustomerId, requestedAmount);
         var content = new StringContent(JsonSerializer.Serialize(creditRequest), Encoding.UTF8, "application/json");
         var response = await httpClient.PostAsync("api/credits", content);
@@ -144,6 +166,13 @@ public class CreditRequestScoringTests : IClassFixture<CustomWebApplicationFacto
         Assert.Equal(expectedCustomerScore, customerScore);
     }
 
+    /// <summary>
+    /// Scenario:
+    ///     EmploymentType - Part-Time, over 2 years on the job.
+    ///     Credit history - 4 missed payments, age over 25.
+    ///     DTI ratio is 60-70%
+    ///     Expected outcome is, rejected because of low score, final score of 45.
+    /// </summary>
     [Fact]
     public async Task CreditRequest_ShouldBeRejected_WithScoreOf45_WhenDebToIncomeIsBetween60And70_OverThreeMissedPayments_AndWithPartTimeEmploymentStabilityBonus()
     {
@@ -183,8 +212,14 @@ public class CreditRequestScoringTests : IClassFixture<CustomWebApplicationFacto
         Assert.Equal(expectedCustomerScore, customerScore);
     }
 
+    /// <summary>
+    /// Scenario:
+    ///     EmploymentType - Part-Time, less than 2 year on the job.
+    ///     Credit history - no credit history, age under 25.
+    ///     Expected outcome is, appproved for max credit amount 20x on net monthly income, final score of 95.
+    /// </summary>
     [Fact]
-    public async Task CreditRequest_ShouldBeApproved_ForCustomerAgedUnder25_For20xOnMonthlyIncome_WithScoreOf95_WhenDebToIncomeIsBetween60And70_NoCreditHistory_AndNoPartTimeEmploymentStabilityBonus()
+    public async Task CreditRequest_ShouldBeApproved_ForCustomerAgedUnder25_For20xOnMonthlyIncome_WithScoreOf95_NoCreditHistory_AndNoPartTimeEmploymentStabilityBonus()
     {
         // No Part-time employment stability bonus because of less than 24 months on the job.
         const decimal customerNetMonthlyIncome = 1500;
