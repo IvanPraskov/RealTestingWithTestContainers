@@ -1,4 +1,4 @@
-﻿using CreditScoringSystem.Infrastructure;
+﻿using CreditScoringSystem.API;
 using Testcontainers.PostgreSql;
 
 namespace CreditScoringSystem.IntegrationTests.Fixtures;
