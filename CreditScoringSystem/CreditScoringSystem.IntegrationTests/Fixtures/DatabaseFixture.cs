@@ -1,4 +1,4 @@
-﻿
+﻿using CreditScoringSystem.Infrastructure;
 using Testcontainers.PostgreSql;
 
 namespace CreditScoringSystem.IntegrationTests.Fixtures;
@@ -17,7 +17,7 @@ public class DatabaseFixture : IAsyncLifetime
     {
         await _postgres.StartAsync();
         ConnectionString = _postgres.GetConnectionString();
-        await DatabaseInitializer.Initialize(ConnectionString);
+        await DbSeeder.Seed(ConnectionString);
     } 
 }
 
