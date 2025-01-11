@@ -31,7 +31,7 @@ namespace EmploymentHistory.API
                     {"0141260470", new("0141260470", EmploymentType.PartTime, 8, 1500) },
                     {"9001013400", new("9001013400", EmploymentType.FullTime, 60, 5000) },
                     {"8403162283", new("8403162283", EmploymentType.SelfEmployed, 24, 4000) },
-                    {"7506027756", new("7506027756", EmploymentType.FullTime, 20, 2000) },
+                    {"7506027756", new("7506027756", EmploymentType.FullTime, 20, 1200) },
                 };
 
                 return empHistories.TryGetValue(customerId, out var empHistory)
