@@ -41,9 +41,8 @@ public class CreditRequestServiceTests
         _customerRepositoryMock
             .Setup(x => x.GetCustomerById(It.IsAny<string>()))
             .ReturnsAsync(customer);
-
-        // Max employment stability bonus - over 5 years on full time job
         const decimal customerNetMonthlyIncome = 5000;
+
         var empHistoryResponse = new EmploymentHistoryResponse(EmploymentType.FullTime, 60, customerNetMonthlyIncome);
         _employmentHistoryClientMock
             .Setup(x => x.GetCustomerEmploymentHistory(It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -69,9 +68,8 @@ public class CreditRequestServiceTests
         _customerRepositoryMock
             .Setup(x => x.GetCustomerById(It.IsAny<string>()))
             .ReturnsAsync(customer);
-
-        // Max employment stability bonus - over 5 years on full time job
         const decimal customerNetMonthlyIncome = 5000;
+
         var empHistoryResponse = new EmploymentHistoryResponse(EmploymentType.FullTime, 60, customerNetMonthlyIncome);
         _employmentHistoryClientMock
             .Setup(x => x.GetCustomerEmploymentHistory(It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -97,9 +95,8 @@ public class CreditRequestServiceTests
         _customerRepositoryMock
             .Setup(x => x.GetCustomerById(It.IsAny<string>()))
             .ReturnsAsync(customer);
-
-        // Max employment stability bonus - over 5 years on full time job
         const decimal customerNetMonthlyIncome = 5000;
+
         var empHistoryResponse = new EmploymentHistoryResponse(EmploymentType.FullTime, 60, customerNetMonthlyIncome);
         _employmentHistoryClientMock
             .Setup(x => x.GetCustomerEmploymentHistory(It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -128,7 +125,6 @@ public class CreditRequestServiceTests
             .Setup(x => x.GetCustomerById(It.IsAny<string>()))
             .ReturnsAsync(customer);
 
-        // Max employment stability bonus - over 5 years on full time job
         const decimal customerNetMonthlyIncome = 5000;
         EmploymentHistoryResponse empHistoryResponse = new EmploymentHistoryResponse(EmploymentType.FullTime, 60, customerNetMonthlyIncome);
         _employmentHistoryClientMock
