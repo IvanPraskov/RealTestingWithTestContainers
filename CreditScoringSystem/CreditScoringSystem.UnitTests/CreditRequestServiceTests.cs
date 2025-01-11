@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace CreditScoringSystem.UnitTests;
-public class CreditRequestScoringTests
+public class CreditRequestServiceTests
 {
     private readonly CreditRequestService _sut;
     private readonly Mock<ICustomerRepository> _customerRepositoryMock;
@@ -17,7 +17,7 @@ public class CreditRequestScoringTests
     private readonly Mock<ICreditRequestRepository> _creditRequestRepositoryMock;
     private readonly Mock<ILogger<CreditRequestService>> _loggerMock;
 
-    public CreditRequestScoringTests()
+    public CreditRequestServiceTests()
     {
         _customerRepositoryMock = new();
         _employmentHistoryClientMock = new();
