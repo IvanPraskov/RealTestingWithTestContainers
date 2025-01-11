@@ -1,5 +1,4 @@
 ﻿using CreditScoringSystem.API.CreditRequests.Data.Dtos;
-using CreditScoringSystem.API.Extensions;
 using Dapper;
 using Npgsql;
 
@@ -18,7 +17,7 @@ internal class CreditRequestPersistence : ICreditRequestPersistance
     {
         await using var conn = new NpgsqlConnection(_connString);
         const string sql = """
-            SELECT DateOfBirth
+            SELECT *
             FROM Customers
             WHERE CustomerId = @CustomerId
             """;
@@ -30,7 +29,6 @@ internal class CreditRequestPersistence : ICreditRequestPersistance
             : new()
             {
                 CustomerId = customerId,
-                Age = result.DateOfBirth.GetAge(),
             };
     }
 

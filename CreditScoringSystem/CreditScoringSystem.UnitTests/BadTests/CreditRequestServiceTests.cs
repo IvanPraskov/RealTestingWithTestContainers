@@ -70,7 +70,6 @@ public class CreditRequestServiceTests
             .Setup(x => x.GetCustomerById(It.IsAny<string>()))
             .ReturnsAsync(customer);
 
-        // Max employment stability bonus - over 5 years on full time job
         const decimal customerNetMonthlyIncome = 5000;
         var empHistoryResponse = new EmploymentHistoryResponse(EmploymentType.FullTime, 60, customerNetMonthlyIncome);
         _employmentHistoryClientMock
@@ -98,7 +97,6 @@ public class CreditRequestServiceTests
             .Setup(x => x.GetCustomerById(It.IsAny<string>()))
             .ReturnsAsync(customer);
 
-        // Max employment stability bonus - over 5 years on full time job
         const decimal customerNetMonthlyIncome = 5000;
         var empHistoryResponse = new EmploymentHistoryResponse(EmploymentType.FullTime, 60, customerNetMonthlyIncome);
         _employmentHistoryClientMock
@@ -128,7 +126,6 @@ public class CreditRequestServiceTests
             .Setup(x => x.GetCustomerById(It.IsAny<string>()))
             .ReturnsAsync(customer);
 
-        // Max employment stability bonus - over 5 years on full time job
         const decimal customerNetMonthlyIncome = 5000;
         EmploymentHistoryResponse empHistoryResponse = new EmploymentHistoryResponse(EmploymentType.FullTime, 60, customerNetMonthlyIncome);
         _employmentHistoryClientMock

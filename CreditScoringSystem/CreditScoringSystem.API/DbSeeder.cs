@@ -105,7 +105,6 @@ public class DbSeeder
     private static async Task SeedCustomers(IDbConnection conn)
     {
         IReadOnlyList<CustomerDbModel> customers = [
-            // customer under 25
             new()
             {
                 CustomerId = "0141260470",
@@ -160,23 +159,26 @@ public class DbSeeder
             {
                 CustomerId = "9001013400",
                 MissedPayments = 2,
+                ExistingMonthlyDebt = 1200,
             },
              new()
             {
                 CustomerId = "8403162283",
                 MissedPayments = 1,
+                ExistingMonthlyDebt = 1045,
             },
             new()
             {
                 CustomerId = "7506027756",
                 MissedPayments = 0,
+                ExistingMonthlyDebt = 600,
             }
         ];
 
         const string insertScript = """
             INSERT INTO public.credithistories(
-            customerid, missedpayments)
-            VALUES (@CustomerId, @MissedPayments);
+            customerid, missedpayments, existingmonthlydebt)
+            VALUES (@CustomerId, @MissedPayments, @ExistingMonthlyDebt);
             """;
         await conn.ExecuteAsync(insertScript, creditHistories);
     }

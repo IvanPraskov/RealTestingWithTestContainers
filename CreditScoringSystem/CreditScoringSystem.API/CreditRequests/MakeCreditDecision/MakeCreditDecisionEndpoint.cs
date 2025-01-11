@@ -32,11 +32,11 @@ internal static class MakeCreditDecisionEndpoint
                 return Results.BadRequest();
             }
 
-            EmploymentHistoryDto employmentHistory = new(emplHistoryResponse.EmploymentType,
+            EmploymentHistoryDto employmentHistory = new(
                                                          emplHistoryResponse.EmploymentDurationInMonths,
                                                          emplHistoryResponse.CurrentNetMonthlyIncome);
             var creditHistory = await persistence.GetCustomerCreditHistory(request.CustomerId);
-            var customerScore = CreditScoreCalculator.Calculate(creditHistory, employmentHistory, customer.Age);
+            var customerScore = CreditScoreCalculator.Calculate(creditHistory, employmentHistory);
             var (decision, maxCreditAmount) = DecideOnCreditRequest(customerScore, employmentHistory, request.RequestedCreditAmount);
             CreditRequestDbModel creditRequestModel = new()
             {

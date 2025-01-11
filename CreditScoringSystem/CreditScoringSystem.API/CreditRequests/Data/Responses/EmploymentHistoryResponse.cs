@@ -1,5 +1,3 @@
-﻿using CreditScoringSystem.API.CreditRequests.MakeCreditDecision;
+﻿namespace CreditScoringSystem.API.CreditRequests.Data.Responses;
 
-namespace CreditScoringSystem.API.CreditRequests.Data.Responses;
-
-public record EmploymentHistoryResponse(EmploymentType EmploymentType, int EmploymentDurationInMonths, decimal CurrentNetMonthlyIncome);
+public record EmploymentHistoryResponse(int EmploymentDurationInMonths, decimal CurrentNetMonthlyIncome);
