@@ -1,7 +1,6 @@
-﻿using CreditScoringSystem.API.Controllers;
-using CreditScoringSystem.Application.Responses;
-using CreditScoringSystem.Domain;
-using CreditScoringSystem.Domain.Contracts;
+﻿using CreditScoringSystem.API.CreditRequests.Data.Dtos;
+using CreditScoringSystem.API.CreditRequests.Data.Responses;
+using CreditScoringSystem.API.CreditRequests.MakeCreditDecision;
 using CreditScoringSystem.IntegrationTests.Fixtures;
 using CreditScoringSystem.IntegrationTests.Helpers;
 using Dapper;
@@ -47,8 +46,8 @@ public class CreditRequestScoringTests : IClassFixture<CustomWebApplicationFacto
 
         CreditHistoryTestData creditHistoryTestData = new(MissedPayments: 0, ExistingMonthlyDebt: 500);
         await using var conn = new NpgsqlConnection(_databaseFixture.ConnectionString);
-        var testData = await CreditRequestTestHelper.SetupTestData(conn, new DateOnly(1975, 06, 02), creditHistoryTestData);       
-        var expectedCreditDecision = new CreditRequestDecisionResponse(testData.CustomerId, "Approved", expectedMaxCreditAmount);       
+        var testData = await CreditRequestTestHelper.SetupTestData(conn, new DateOnly(1975, 06, 02), creditHistoryTestData);
+        var expectedCreditDecision = new CreditRequestDecisionResponse(testData.CustomerId, "Approved", expectedMaxCreditAmount);
 
         var httpClient = _customWebApplicationFactory.CreateClient();
         var creditRequest = new CustomerCreditRequest(testData.CustomerId, requestedAmount);
@@ -91,7 +90,7 @@ public class CreditRequestScoringTests : IClassFixture<CustomWebApplicationFacto
             .ReturnsAsync(empHistoryResponse);
         CreditHistoryTestData creditHistoryTestData = new(MissedPayments: 2, ExistingMonthlyDebt: 2700);
         await using var conn = new NpgsqlConnection(_databaseFixture.ConnectionString);
-        var testData = await CreditRequestTestHelper.SetupTestData(conn, new DateOnly(1975, 06, 02), creditHistoryTestData);      
+        var testData = await CreditRequestTestHelper.SetupTestData(conn, new DateOnly(1975, 06, 02), creditHistoryTestData);
         var expectedCreditDecision = new CreditRequestDecisionResponse(testData.CustomerId, "Approved", expectedMaxCreditAmount);
 
         var httpClient = _customWebApplicationFactory.CreateClient();
@@ -134,7 +133,7 @@ public class CreditRequestScoringTests : IClassFixture<CustomWebApplicationFacto
         // High DTI with 2 missed payments -> DTI (50-60%) penalty of 20 and credit history penalty of 10 => -30 score
         CreditHistoryTestData creditHistoryTestData = new(MissedPayments: 2, ExistingMonthlyDebt: 2700);
         await using var conn = new NpgsqlConnection(_databaseFixture.ConnectionString);
-        var testData = await CreditRequestTestHelper.SetupTestData(conn, new DateOnly(1975, 06, 02), creditHistoryTestData);      
+        var testData = await CreditRequestTestHelper.SetupTestData(conn, new DateOnly(1975, 06, 02), creditHistoryTestData);
         var expectedCreditDecision = new CreditRequestDecisionResponse(testData.CustomerId, "Rejected", expectedMaxCreditAmount);
 
         var httpClient = _customWebApplicationFactory.CreateClient();
@@ -218,7 +217,7 @@ public class CreditRequestScoringTests : IClassFixture<CustomWebApplicationFacto
         CreditHistoryTestData creditHistoryTestData = new(MissedPayments: 0, ExistingMonthlyDebt: 0, IsWithCreditHistory: false);
         await using var conn = new NpgsqlConnection(_databaseFixture.ConnectionString);
         var under25BirthYear = DateTime.UtcNow.Year - 23;
-        var testData = await CreditRequestTestHelper.SetupTestData(conn, new DateOnly(under25BirthYear, 06, 02), creditHistoryTestData);   
+        var testData = await CreditRequestTestHelper.SetupTestData(conn, new DateOnly(under25BirthYear, 06, 02), creditHistoryTestData);
         var expectedCreditDecision = new CreditRequestDecisionResponse(testData.CustomerId, "Approved", expectedMaxCreditAmount);
 
         var httpClient = _customWebApplicationFactory.CreateClient();

@@ -1,8 +1,8 @@
 using CreditScoringSystem.API.Configuration.DI;
-using CreditScoringSystem.Application.Configuration.DI;
-using CreditScoringSystem.Infrastructure;
-using CreditScoringSystem.Infrastructure.Configuration.DI;
+using CreditScoringSystem.API.CreditRequests;
+using System.Runtime.CompilerServices;
 
+[assembly: InternalsVisibleTo("CreditScoringSystem.IntegrationTests")]
 namespace CreditScoringSystem.API;
 
 public class Program
@@ -17,9 +17,7 @@ public class Program
         builder.Services
             .AddOpenApi()
             .AddHttpClients(builder.Configuration)
-            .AddApplicationServices()
-            .AddRepositories()
-            .AddClients();
+            .AddCreditRequestModule();
 
         var app = builder.Build();
 
@@ -34,7 +32,7 @@ public class Program
 
         app.UseAuthorization();
 
-        app.MapControllers();
+        app.MapCreditRequests();
 
         app.Run();
     }

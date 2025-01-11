@@ -1,5 +1,5 @@
 ﻿using Bogus;
-using CreditScoringSystem.Infrastructure.DbModels;
+using CreditScoringSystem.API.CreditRequests.Data.Database;
 using Dapper;
 using System.Data;
 
