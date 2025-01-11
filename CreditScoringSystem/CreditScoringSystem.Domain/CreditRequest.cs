@@ -9,7 +9,7 @@ public sealed class CreditRequest
 
     public decimal MaxCreditAmount { get; private set; }
 
-    public CreditRequestDecision CreditRequestDecision { get; private set;  }
+    public CreditRequestDecision CreditRequestDecision { get; private set; }
 
     public string CustomerId { get; }
 
@@ -19,17 +19,14 @@ public sealed class CreditRequest
 
     private readonly EmploymentHistoryDto _employmentHistory;
 
-    private readonly int _customerAge;
-
     private readonly (int MinScore, int MaxScore) ManualReviewScoreRange = (50, 60);
 
     private const int MinimumApprovalScore = 50;
 
-    public CreditRequest(string customerId, decimal requestedAmount, int customerAge, EmploymentHistoryDto employmentHistory)
+    public CreditRequest(string customerId, decimal requestedAmount, EmploymentHistoryDto employmentHistory)
     {
         CustomerId = customerId;
         RequestedAmount = requestedAmount;
-        _customerAge = customerAge;
         _employmentHistory = employmentHistory;
     }
 
@@ -52,16 +49,12 @@ public sealed class CreditRequest
         return Math.Clamp(score, 0, MaxCustomerScore);
     }
 
-    private int ApplyCreditHistoryPenaltyIfAny(int currentScore, CreditHistoryDto? creditHistory)
+    private static int ApplyCreditHistoryPenaltyIfAny(int currentScore, CreditHistoryDto? creditHistory)
     {
-        if (creditHistory is null && _customerAge < 25)
-        {
-            currentScore -= 5;
-        }
-
         currentScore -= creditHistory?.MissedPayments switch
         {
-            0 or null => 0,
+            0 => 0,
+            null => 5,
             1 or 2 => 10,
             >= 3 => 30,
             _ => throw new ArgumentOutOfRangeException(nameof(creditHistory)),
@@ -76,10 +69,8 @@ public sealed class CreditRequest
         currentScore -= dti switch
         {
             <= 30 => 0,
-            > 30 and <= 50 => 10,
-            > 50 and <= 60 => 20,
-            > 60 and <= 70 => 30,
-            > 70 => 40,
+            > 30 and <= 60 => 20,
+            > 60 => 40,
         };
 
         return currentScore;
@@ -90,26 +81,11 @@ public sealed class CreditRequest
 
     private int ApplyEmploymentStabilityBonusIfAny(int currentScore)
     {
-        currentScore += _employmentHistory.EmploymentType switch
+        currentScore += _employmentHistory.EmploymentDurationInMonths switch
         {
-            EmploymentType.SelfEmployed => _employmentHistory.EmploymentDurationInMonths switch
-            {
-                >= 60 => 15,
-                >= 24 and < 60 => 10,
-                < 24 => 0,
-            },
-            EmploymentType.FullTime => _employmentHistory.EmploymentDurationInMonths switch
-            {
-                >= 36 => 10,
-                >= 12 and < 36 => 5,
-                < 12 => 0,
-            },
-            EmploymentType.PartTime => _employmentHistory.EmploymentDurationInMonths switch
-            {
-                >= 24 => 5,
-                < 24 => 0,
-            },
-            _ => throw new ArgumentOutOfRangeException(_employmentHistory.EmploymentType.ToString()),
+            >= 60 => 15,
+            >= 12 and < 60 => 10,
+            < 12 => 0,
         };
 
         return currentScore;

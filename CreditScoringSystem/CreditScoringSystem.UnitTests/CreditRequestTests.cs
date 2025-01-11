@@ -26,7 +26,7 @@ public class CreditRequestTests
         const decimal netMonhtlyIncome = 5534;
         const decimal expectedMaxCreditAmount = 20 * netMonhtlyIncome;
         var customerId = new Faker().Random.String2(10, "0123456789");
-        CreditRequest credit = new(customerId, requestedAmount: 10_000, customerAge: 27, new(EmploymentType.SelfEmployed, 12, netMonhtlyIncome));
+        CreditRequest credit = new(customerId, requestedAmount: 10_000, new(12, netMonhtlyIncome));
         CreditHistoryDto creditHistory = new(customerId, 0, 500);
         _creditHistoryRepositoryMock
             .Setup(x => x.GetCustomerCreditHistory(It.IsAny<string>()))

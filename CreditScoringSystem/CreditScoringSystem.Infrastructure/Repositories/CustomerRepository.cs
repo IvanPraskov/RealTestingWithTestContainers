@@ -20,7 +20,7 @@ internal class CustomerRepository : ICustomerRepository
     {
         await using var conn = new NpgsqlConnection(_connString);
         const string sql = """
-            SELECT DateOfBirth
+            SELECT *
             FROM Customers
             WHERE CustomerId = @CustomerId
             """;
@@ -31,8 +31,7 @@ internal class CustomerRepository : ICustomerRepository
             ? null
             : new()
             {
-                CustomerId = customerId,
-                Age = result.DateOfBirth.GetAge(),
+                CustomerId = customerId
             };
     }
 }

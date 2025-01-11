@@ -46,8 +46,8 @@ internal class CreditRequestService : ICreditRequestService
         }
 
         EmploymentHistoryDto empHistoryDto =
-            new(emplHistoryResponse.EmploymentType, emplHistoryResponse.EmploymentDurationInMonths, emplHistoryResponse.CurrentNetMonthlyIncome);
-        var creditRequest = new CreditRequest(command.CustomerId, command.RequestedAmount, customer.Age, empHistoryDto);
+            new(emplHistoryResponse.EmploymentDurationInMonths, emplHistoryResponse.CurrentNetMonthlyIncome);
+        var creditRequest = new CreditRequest(command.CustomerId, command.RequestedAmount, empHistoryDto);
 
         await creditRequest.MakeCreditDecision(_creditHistoryRepository, _creditRequestRepository);
         _logger.LogInformation("Credit request scored successfully. {@CreditRequest}", creditRequest);

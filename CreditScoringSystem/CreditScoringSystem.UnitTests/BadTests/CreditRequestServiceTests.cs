@@ -35,16 +35,14 @@ public class CreditRequestServiceTests
     {
         Customer customer = new()
         {
-            Age = 30,
             CustomerId = new Faker().Random.String2(10, "0123456789"),
         };
         _customerRepositoryMock
             .Setup(x => x.GetCustomerById(It.IsAny<string>()))
             .ReturnsAsync(customer);
 
-        // Max employment stability bonus - over 5 years on full time job
         const decimal customerNetMonthlyIncome = 5000;
-        var empHistoryResponse = new EmploymentHistoryResponse(EmploymentType.FullTime, 60, customerNetMonthlyIncome);
+        var empHistoryResponse = new EmploymentHistoryResponse(60, customerNetMonthlyIncome);
         _employmentHistoryClientMock
             .Setup(x => x.GetCustomerEmploymentHistory(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(empHistoryResponse);
@@ -63,16 +61,14 @@ public class CreditRequestServiceTests
     {
         Customer customer = new()
         {
-            Age = 30,
             CustomerId = new Faker().Random.String2(10, "0123456789"),
         };
         _customerRepositoryMock
             .Setup(x => x.GetCustomerById(It.IsAny<string>()))
             .ReturnsAsync(customer);
 
-        // Max employment stability bonus - over 5 years on full time job
         const decimal customerNetMonthlyIncome = 5000;
-        var empHistoryResponse = new EmploymentHistoryResponse(EmploymentType.FullTime, 60, customerNetMonthlyIncome);
+        var empHistoryResponse = new EmploymentHistoryResponse(60, customerNetMonthlyIncome);
         _employmentHistoryClientMock
             .Setup(x => x.GetCustomerEmploymentHistory(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(empHistoryResponse);
@@ -91,16 +87,14 @@ public class CreditRequestServiceTests
     {
         Customer customer = new()
         {
-            Age = 30,
             CustomerId = new Faker().Random.String2(10, "0123456789"),
         };
         _customerRepositoryMock
             .Setup(x => x.GetCustomerById(It.IsAny<string>()))
             .ReturnsAsync(customer);
 
-        // Max employment stability bonus - over 5 years on full time job
         const decimal customerNetMonthlyIncome = 5000;
-        var empHistoryResponse = new EmploymentHistoryResponse(EmploymentType.FullTime, 60, customerNetMonthlyIncome);
+        var empHistoryResponse = new EmploymentHistoryResponse(60, customerNetMonthlyIncome);
         _employmentHistoryClientMock
             .Setup(x => x.GetCustomerEmploymentHistory(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(empHistoryResponse);
@@ -121,16 +115,14 @@ public class CreditRequestServiceTests
     {
         Customer customer = new()
         {
-            Age = 30,
             CustomerId = new Faker().Random.String2(10, "0123456789"),
         };
         _customerRepositoryMock
             .Setup(x => x.GetCustomerById(It.IsAny<string>()))
             .ReturnsAsync(customer);
 
-        // Max employment stability bonus - over 5 years on full time job
         const decimal customerNetMonthlyIncome = 5000;
-        EmploymentHistoryResponse empHistoryResponse = new EmploymentHistoryResponse(EmploymentType.FullTime, 60, customerNetMonthlyIncome);
+        EmploymentHistoryResponse empHistoryResponse = new (60, customerNetMonthlyIncome);
         _employmentHistoryClientMock
             .Setup(x => x.GetCustomerEmploymentHistory(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(empHistoryResponse);

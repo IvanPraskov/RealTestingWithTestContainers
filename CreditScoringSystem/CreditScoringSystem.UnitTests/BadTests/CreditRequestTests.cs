@@ -12,7 +12,7 @@ public class CreditRequestTests
     public void BadTest_TestingHardcodedValues()
     {
         var customerId = new Faker().Random.String2(10, "0123456789");
-        CreditRequest credit = new(customerId, requestedAmount: 10_000, customerAge: 27, new(EmploymentType.SelfEmployed, 12, 5534));
+        CreditRequest credit = new(customerId, requestedAmount: 10_000, new(12, 5534));
 
         Assert.Equal(10_000, credit.RequestedAmount);
         Assert.NotEmpty(credit.CustomerId);
@@ -23,7 +23,7 @@ public class CreditRequestTests
     {
         var customerId = new Faker().Random.String2(10, "0123456789");
         var response = new CreditRequestDecisionResponse(customerId, "Approved", 10000);
-        CreditRequest credit = new(customerId, requestedAmount: 10_000, customerAge: 27, new(EmploymentType.SelfEmployed, 12, 5534));
+        CreditRequest credit = new(customerId, requestedAmount: 10_000, new(12, 5534));
         CreditHistoryDto creditHistory = new(customerId, 0, 500);
         var creditHistoryRepositoryMock = new Mock<ICreditHistoryRepository>();
         creditHistoryRepositoryMock
@@ -44,7 +44,7 @@ public class CreditRequestTests
     {
         var customerId = new Faker().Random.String2(10, "0123456789");
         var response = new CreditRequestDecisionResponse(customerId, "Approved", 10000);
-        CreditRequest credit = new(customerId, requestedAmount: 10_000, customerAge: 27, new(EmploymentType.SelfEmployed, 12, 5534));
+        CreditRequest credit = new(customerId, requestedAmount: 10_000, new(12, 5534));
         CreditHistoryDto creditHistory = new(customerId, 0, 500);
         var creditHistoryRepositoryMock = new Mock<ICreditHistoryRepository>();
         creditHistoryRepositoryMock
