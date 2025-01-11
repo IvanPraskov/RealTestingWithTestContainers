@@ -30,9 +30,16 @@ public class CreditRequestServiceTests
         _sut = new(_customerRepositoryMock.Object, _employmentHistoryClientMock.Object, _creditHistoryRepositoryMock.Object, _creditRequestRepositoryMock.Object, _loggerMock.Object);
     }
 
+    /// <summary>
+    /// Scenario:
+    ///     EmploymentType - Full-Time, over 3 years on the job.
+    ///     Credit history - no missed payments, age over 25.
+    ///     DTI ratio is below 30%
+    ///     Expected outcome is, appproved for max credit amount 20x on net monthly income, final score of 100.
+    /// </summary>
     [Fact]
-    public async Task CreditRequest_ShouldBeApproved_For20xOnMonthlyIncome_WithScoreOf100_WhenFullTimeEmploymentIsOver3Years_CreditHistoryHasNoMissedPayments_AndDebtToIncomeIsLowest()
-    {
+    public async Task CreditRequest_Scenario1() 
+    { 
         Customer customer = new()
         {
             Age = 30,
@@ -42,8 +49,10 @@ public class CreditRequestServiceTests
             .Setup(x => x.GetCustomerById(It.IsAny<string>()))
             .ReturnsAsync(customer);
 
-        // Max employment stability bonus - over 5 years on full time job
         const decimal customerNetMonthlyIncome = 5000;
+        const decimal expectedMaxCreditAmount = 20 * customerNetMonthlyIncome;
+        var expectedCreditDecision = new CreditRequestDecisionResponse(customer.CustomerId, "Approved", expectedMaxCreditAmount);
+
         var empHistoryResponse = new EmploymentHistoryResponse(Domain.EmploymentType.FullTime, 60, customerNetMonthlyIncome);
         _employmentHistoryClientMock
             .Setup(x => x.GetCustomerEmploymentHistory(It.IsAny<string>(), It.IsAny<CancellationToken>()))
@@ -54,18 +63,21 @@ public class CreditRequestServiceTests
             .Setup(x => x.GetCustomerCreditHistory(It.IsAny<string>()))
             .ReturnsAsync(creditHistory);
 
-        const decimal expectedMaxCreditAmount = 20 * customerNetMonthlyIncome;
-        var expectedCreditDecision = new CreditRequestDecisionResponse(customer.CustomerId, "Approved", expectedMaxCreditAmount);
-
         var actualCreditDecision = await _sut.MakeCreditRequestDecision(new(customer.CustomerId, 10_000), CancellationToken.None);
 
         Assert.Equal(expectedCreditDecision, actualCreditDecision);
-
         _creditRequestRepositoryMock.Verify(x => x.SaveCreditRequest(It.Is<CreditRequest>(cr => cr.CustomerScore == 100)), Times.Once);
     }
 
+    /// <summary>
+    /// Scenario:
+    ///     EmploymentType - Full-Time, less than 1 year on the job.
+    ///     Credit history - 2 missed payments, age over 25.
+    ///     DTI ratio is 50-60%
+    ///     Expected outcome is, appproved for max credit amount 10x on net monthly income, final score of 70.
+    /// </summary>
     [Fact]
-    public async Task CreditRequest_ShouldBeApproved_For10xOnMonthlyIncome_WithScoreOf70_WhenFullTimeEmploymentIsLessThanOneYear_CreditHistoryHasOneOrTwoMissedPayments_AndDebtToIncomeIsMidToHigh()
+    public async Task CreditRequest_Scenario2()
     {
         Customer customer = new()
         {
@@ -76,32 +88,35 @@ public class CreditRequestServiceTests
             .Setup(x => x.GetCustomerById(It.IsAny<string>()))
             .ReturnsAsync(customer);
 
-        // Max employment stability bonus - over 5 years on full time job
         const decimal customerNetMonthlyIncome = 5000;
-        // No employment stability bonus because of just 10 months on the full-time job.
+        const decimal expectedMaxCreditAmount = 10 * customerNetMonthlyIncome;
+        var expectedCreditDecision = new CreditRequestDecisionResponse(customer.CustomerId, "Approved", expectedMaxCreditAmount);
+
         var empHistoryResponse = new EmploymentHistoryResponse(Domain.EmploymentType.FullTime, 10, customerNetMonthlyIncome);
         _employmentHistoryClientMock
             .Setup(x => x.GetCustomerEmploymentHistory(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(empHistoryResponse);
 
-        // High DTI with 2 missed payments -> DTI (50-60%) penalty of 20 and credit history penalty of 10 => -30 score
         CreditHistoryDto creditHistory = new(customer.CustomerId, 2, 2700);
         _creditHistoryRepositoryMock
             .Setup(x => x.GetCustomerCreditHistory(It.IsAny<string>()))
             .ReturnsAsync(creditHistory);
-
-        const decimal expectedMaxCreditAmount = 10 * customerNetMonthlyIncome;
-        var expectedCreditDecision = new CreditRequestDecisionResponse(customer.CustomerId, "Approved", expectedMaxCreditAmount);
 
         var actualCreditDecision = await _sut.MakeCreditRequestDecision(new(customer.CustomerId, 10_000), CancellationToken.None);
 
         Assert.Equal(expectedCreditDecision, actualCreditDecision);
-
         _creditRequestRepositoryMock.Verify(x => x.SaveCreditRequest(It.Is<CreditRequest>(cr => cr.CustomerScore == 70)), Times.Once);
     }
 
+    /// <summary>
+    /// Scenario:
+    ///     EmploymentType - Full-Time, less than 1 year on the job.
+    ///     Credit history - 2 missed payments, age over 25.
+    ///     DTI ratio is 50-60%
+    ///     Expected outcome is, rejected because requested amount is over max credit amount 10x on net monthly income, final score of 70.
+    /// </summary>
     [Fact]
-    public async Task CreditRequest_ShouldBeRejected_WhenRequestedAmount_IsOverMaxCreditAmount()
+    public async Task CreditRequest_Scenario3()
     {
         Customer customer = new()
         {
@@ -112,33 +127,37 @@ public class CreditRequestServiceTests
             .Setup(x => x.GetCustomerById(It.IsAny<string>()))
             .ReturnsAsync(customer);
 
-        // Max employment stability bonus - over 5 years on full time job
         const decimal customerNetMonthlyIncome = 5000;
-        // No employment stability bonus because of just 10 months on the full-time job.
+        const decimal expectedMaxCreditAmount = 10 * customerNetMonthlyIncome;
+        var expectedCreditDecision = new CreditRequestDecisionResponse(customer.CustomerId, "Rejected", expectedMaxCreditAmount);
+       
+        const decimal requestedAmount = expectedMaxCreditAmount * 2;
+
         var empHistoryResponse = new EmploymentHistoryResponse(Domain.EmploymentType.FullTime, 10, customerNetMonthlyIncome);
         _employmentHistoryClientMock
             .Setup(x => x.GetCustomerEmploymentHistory(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(empHistoryResponse);
 
-        // High DTI with 2 missed payments -> DTI (50-60%) penalty of 20 and credit history penalty of 10 => -30 score
         CreditHistoryDto creditHistory = new(customer.CustomerId, 2, 2700);
         _creditHistoryRepositoryMock
             .Setup(x => x.GetCustomerCreditHistory(It.IsAny<string>()))
             .ReturnsAsync(creditHistory);
-
-        const decimal expectedMaxCreditAmount = 10 * customerNetMonthlyIncome;
-        var expectedCreditDecision = new CreditRequestDecisionResponse(customer.CustomerId, "Rejected", expectedMaxCreditAmount);
-        // Set requested amount larger than the expected approved max credit amount
-        const decimal requestedAmount = expectedMaxCreditAmount * 2;
+        
         var actualCreditDecision = await _sut.MakeCreditRequestDecision(new(customer.CustomerId, requestedAmount), CancellationToken.None);
 
         Assert.Equal(expectedCreditDecision, actualCreditDecision);
-
         _creditRequestRepositoryMock.Verify(x => x.SaveCreditRequest(It.Is<CreditRequest>(cr => cr.CustomerScore == 70)), Times.Once);
     }
 
+    /// <summary>
+    /// Scenario:
+    ///     EmploymentType - Part-Time, over 2 years on the job.
+    ///     Credit history - 4 missed payments, age over 25.
+    ///     DTI ratio is 60-70%
+    ///     Expected outcome is, rejected because of low score, final score of 45.
+    /// </summary>
     [Fact]
-    public async Task CreditRequest_ShouldBeRejected_WithScoreOf45_WhenDebToIncomeIsBetween60And70_OverThreeMissedPayments_AndWithPartTimeEmploymentStabilityBonus()
+    public async Task CreditRequest_Scenario4()
     {
         Customer customer = new()
         {
@@ -149,32 +168,36 @@ public class CreditRequestServiceTests
             .Setup(x => x.GetCustomerById(It.IsAny<string>()))
             .ReturnsAsync(customer);
 
-        // Part-time employment stability bonus of +5 because of over 24 months on the job.
         const decimal customerNetMonthlyIncome = 5000;
+        // Rejected
+        const decimal expectedMaxCreditAmount = 0;
+        var expectedCreditDecision = new CreditRequestDecisionResponse(customer.CustomerId, "Rejected", expectedMaxCreditAmount);
+        const decimal requestedAmount = 10_000;
+
         var empHistoryResponse = new EmploymentHistoryResponse(Domain.EmploymentType.PartTime, 30, customerNetMonthlyIncome);
         _employmentHistoryClientMock
             .Setup(x => x.GetCustomerEmploymentHistory(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(empHistoryResponse);
-
-        // High DTI with 4 missed payments -> DTI (60-70%) penalty of 30 and credit history penalty of 30 => -60 score
         CreditHistoryDto creditHistory = new(customer.CustomerId, 4, 3200);
         _creditHistoryRepositoryMock
             .Setup(x => x.GetCustomerCreditHistory(It.IsAny<string>()))
             .ReturnsAsync(creditHistory);
-        // Rejected
-        const decimal expectedMaxCreditAmount = 0;
-        var expectedCreditDecision = new CreditRequestDecisionResponse(customer.CustomerId, "Rejected", expectedMaxCreditAmount);
-        // Set requested amount larger than the expected approved max credit amount
-        const decimal requestedAmount = 10_000;
+        
+        
         var actualCreditDecision = await _sut.MakeCreditRequestDecision(new(customer.CustomerId, requestedAmount), CancellationToken.None);
 
         Assert.Equal(expectedCreditDecision, actualCreditDecision);
-
         _creditRequestRepositoryMock.Verify(x => x.SaveCreditRequest(It.Is<CreditRequest>(cr => cr.CustomerScore == 45)), Times.Once);
     }
 
+    /// <summary>
+    /// Scenario:
+    ///     EmploymentType - Part-Time, less than 2 year on the job.
+    ///     Credit history - no credit history, age under 25.
+    ///     Expected outcome is, appproved for max credit amount 20x on net monthly income, final score of 95.
+    /// </summary>
     [Fact]
-    public async Task CreditRequest_ShouldBeApproved_ForCustomerAgedUnder25_For20xOnMonthlyIncome_WithScoreOf95_WhenDebToIncomeIsBetween60And70_NoCreditHistory_AndNoPartTimeEmploymentStabilityBonus()
+    public async Task CreditRequest_Scenario5()
     {
         Customer customer = new()
         {
@@ -185,27 +208,25 @@ public class CreditRequestServiceTests
             .Setup(x => x.GetCustomerById(It.IsAny<string>()))
             .ReturnsAsync(customer);
 
-        // No Part-time employment stability bonus because of less than 24 months on the job.
         const decimal customerNetMonthlyIncome = 1500;
+        // Rejected
+        const decimal expectedMaxCreditAmount = 20 * customerNetMonthlyIncome;
+        const decimal requestedAmount = 10_000;
+        var expectedCreditDecision = new CreditRequestDecisionResponse(customer.CustomerId, "Approved", expectedMaxCreditAmount);
+
         var empHistoryResponse = new EmploymentHistoryResponse(Domain.EmploymentType.PartTime, 12, customerNetMonthlyIncome);
         _employmentHistoryClientMock
             .Setup(x => x.GetCustomerEmploymentHistory(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(empHistoryResponse);
 
-        // No credit history and under 25 -> -5 
         CreditHistoryDto? creditHistory = null;
         _creditHistoryRepositoryMock
             .Setup(x => x.GetCustomerCreditHistory(It.IsAny<string>()))
             .ReturnsAsync(creditHistory);
-        // Rejected
-        const decimal expectedMaxCreditAmount = 20 * customerNetMonthlyIncome;
-        var expectedCreditDecision = new CreditRequestDecisionResponse(customer.CustomerId, "Approved", expectedMaxCreditAmount);
-        // Set requested amount larger than the expected approved max credit amount
-        const decimal requestedAmount = 10_000;
+
         var actualCreditDecision = await _sut.MakeCreditRequestDecision(new(customer.CustomerId, requestedAmount), CancellationToken.None);
 
         Assert.Equal(expectedCreditDecision, actualCreditDecision);
-
         _creditRequestRepositoryMock.Verify(x => x.SaveCreditRequest(It.Is<CreditRequest>(cr => cr.CustomerScore == 95)), Times.Once);
     }
 }
