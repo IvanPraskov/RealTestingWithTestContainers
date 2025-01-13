@@ -3,6 +3,7 @@ using CreditScoringSystem.API.CreditRequests;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("CreditScoringSystem.IntegrationTests")]
+[assembly: InternalsVisibleTo("CreditScoringSystem.UnitTests")]
 namespace CreditScoringSystem.API;
 
 public class Program

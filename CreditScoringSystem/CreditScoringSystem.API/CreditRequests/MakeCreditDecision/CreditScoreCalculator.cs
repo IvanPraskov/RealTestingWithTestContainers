@@ -2,7 +2,7 @@
 
 namespace CreditScoringSystem.API.CreditRequests.MakeCreditDecision;
 
-public static class CreditScoreCalculator
+internal static class CreditScoreCalculator
 {
     private const int MaxCustomerScore = 100;
 
