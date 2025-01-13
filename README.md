@@ -80,6 +80,14 @@ The Credit Scoring System applies the following rules:
 
 ---
 
+## Key Features
+
+- **Credit Scoring System**: Evaluates credit requests based on income, debt, and credit history.  
+- **Employment History API**: Simulates an external service for fetching employment data.  
+- **Integration Testing with Testcontainers**: Highlights how to avoid heavy mocking and create meaningful tests.  
+
+---
+
 ## Next Steps
 
 ### **Part 3 - Fix Failing Unit Tests**
@@ -95,14 +103,6 @@ Ideas for new features to extend the functionality and practice adding such test
 - [ ] Add endpoint to manually approve/reject a credit request
 - [ ] On approval return multiple credit offers with different interest rates and periods
 - [ ] Add eventing to notify other service/s once credit request is approved and try to test this
-
----
-
-## Key Features
-
-- **Credit Scoring System**: Evaluates credit requests based on income, debt, and credit history.  
-- **Employment History API**: Simulates an external service for fetching employment data.  
-- **Integration Testing with Testcontainers**: Highlights how to avoid heavy mocking and create meaningful tests.  
 
 ---
 
